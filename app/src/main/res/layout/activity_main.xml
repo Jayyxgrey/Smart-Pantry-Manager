@@ -21,6 +21,16 @@
         android:layout_weight="1" />
 
     <Button
+        android:id="@+id/buttonSuggestedRecipes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Suggested Recipes" />
+    <Button
+        android:id="@+id/buttonSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings" />
+    <Button
         android:id="@+id/buttonAddIngredient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

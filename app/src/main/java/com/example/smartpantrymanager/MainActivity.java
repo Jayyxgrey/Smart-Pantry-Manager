@@ -14,6 +14,7 @@ import com.example.smartpantrymanager.models.Ingredient;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import com.example.smartpantrymanager.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,7 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private PantryAdapter pantryAdapter;
     private List<Ingredient> ingredientList;
     private Button buttonAddIngredient;
+    private Button buttonSuggestedRecipes;
     private DatabaseHelper databaseHelper;
+    private Button buttonSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +34,36 @@ public class MainActivity extends AppCompatActivity {
         // Connect MainActivity to activity_main.xml
         setContentView(R.layout.activity_main);
 
+        buttonSuggestedRecipes =
+                findViewById(
+                        R.id.buttonSuggestedRecipes
+                );
+
+        buttonSuggestedRecipes.setOnClickListener(v -> {
+
+            Intent intent =
+                    new Intent(
+                            MainActivity.this,
+                            SuggestedRecipesActivity.class
+                    );
+
+            startActivity(intent);
+        });
+
         // Connect Java variables to XML views
         recyclerPantry = findViewById(R.id.recyclerPantry);
         buttonAddIngredient = findViewById(R.id.buttonAddIngredient);
+
+        buttonSettings = findViewById(R.id.buttonSettings);
+
+        buttonSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    SettingsActivity.class
+            );
+
+            startActivity(intent);
+        });
 
         databaseHelper = new DatabaseHelper(this);
         // Set up RecyclerView
