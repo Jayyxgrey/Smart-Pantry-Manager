@@ -1,6 +1,8 @@
 package com.example.smartpantrymanager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,14 +19,20 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerPantry;
     private PantryAdapter pantryAdapter;
     private List<Ingredient> ingredientList;
+    private Button buttonAddIngredient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Connect MainActivity to activity_main.xml
         setContentView(R.layout.activity_main);
 
+        // Connect Java variables to XML views
         recyclerPantry = findViewById(R.id.recyclerPantry);
+        buttonAddIngredient = findViewById(R.id.buttonAddIngredient);
 
+        // Set up RecyclerView
         recyclerPantry.setLayoutManager(
                 new LinearLayoutManager(this)
         );
@@ -52,8 +60,19 @@ public class MainActivity extends AppCompatActivity {
                 )
         );
 
+        // Connect list to RecyclerView
         pantryAdapter = new PantryAdapter(ingredientList);
-
         recyclerPantry.setAdapter(pantryAdapter);
+
+        // Open Add Ingredient screen
+        buttonAddIngredient.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    AddEditIngredientActivity.class
+            );
+
+            startActivity(intent);
+        });
     }
 }

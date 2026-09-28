@@ -3,9 +3,30 @@ package com.example.smartpantrymanager.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.content.ContentValues;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    public long addIngredient(String name,
+                              double quantity,
+                              String unit,
+                              String expiryDate) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(PANTRY_NAME, name);
+        values.put(PANTRY_QUANTITY, quantity);
+        values.put(PANTRY_UNIT, unit);
+        values.put(PANTRY_EXPIRY, expiryDate);
+
+        return db.insert(
+                TABLE_PANTRY,
+                null,
+                values
+        );
+    }
     private static final String DATABASE_NAME = "smart_pantry.db";
     private static final int DATABASE_VERSION = 1;
 
