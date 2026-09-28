@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartpantrymanager.R;
 import com.example.smartpantrymanager.models.Ingredient;
+import android.widget.Button;
 
 import java.util.List;
 
@@ -18,8 +19,21 @@ public class PantryAdapter
 
     private final List<Ingredient> ingredientList;
 
-    public PantryAdapter(List<Ingredient> ingredientList) {
+    private final OnIngredientActionListener listener;
+
+    public interface OnIngredientActionListener {
+
+        void onEdit(Ingredient ingredient);
+
+        void onDelete(Ingredient ingredient);
+    }
+
+    public PantryAdapter(
+            List<Ingredient> ingredientList,
+            OnIngredientActionListener listener) {
+
         this.ingredientList = ingredientList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -52,6 +66,14 @@ public class PantryAdapter
                 "Expires: " + ingredient.getExpiryDate();
 
         holder.textExpiry.setText(expiry);
+
+        holder.buttonEdit.setOnClickListener(
+                v -> listener.onEdit(ingredient)
+        );
+
+        holder.buttonDelete.setOnClickListener(
+                v -> listener.onDelete(ingredient)
+        );
     }
 
     @Override
@@ -65,6 +87,9 @@ public class PantryAdapter
         TextView textName;
         TextView textQuantity;
         TextView textExpiry;
+        Button buttonEdit;
+        Button buttonDelete;
+
 
         public PantryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -77,6 +102,11 @@ public class PantryAdapter
 
             textExpiry =
                     itemView.findViewById(R.id.textIngredientExpiry);
+            buttonEdit =
+                    itemView.findViewById(R.id.buttonEdit);
+
+            buttonDelete =
+                    itemView.findViewById(R.id.buttonDelete);
         }
     }
 }

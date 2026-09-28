@@ -4,9 +4,128 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.ContentValues;
+import android.database.Cursor;
 
+import com.example.smartpantrymanager.models.Ingredient;
+
+import java.util.ArrayList;
+import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    public int updateIngredient(int id,
+                                String name,
+                                double quantity,
+                                String unit,
+                                String expiryDate) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(PANTRY_NAME, name);
+        values.put(PANTRY_QUANTITY, quantity);
+        values.put(PANTRY_UNIT, unit);
+        values.put(PANTRY_EXPIRY, expiryDate);
+
+        return db.update(
+                TABLE_PANTRY,
+                values,
+                PANTRY_ID + " = ?",
+                new String[]{
+                        String.valueOf(id)
+                }
+        );
+    }
+    public int deleteIngredient(int id) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        return db.delete(
+                TABLE_PANTRY,
+                PANTRY_ID + " = ?",
+                new String[]{
+                        String.valueOf(id)
+                }
+        );
+    }
+    public List<Ingredient> getAllIngredients() {
+
+        List<Ingredient> ingredientList =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_PANTRY,
+                null,
+                null,
+                null,
+                null,
+                null,
+                PANTRY_NAME + " ASC"
+        );
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                int id =
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow(
+                                        PANTRY_ID
+                                )
+                        );
+
+                String name =
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                        PANTRY_NAME
+                                )
+                        );
+
+                double quantity =
+                        cursor.getDouble(
+                                cursor.getColumnIndexOrThrow(
+                                        PANTRY_QUANTITY
+                                )
+                        );
+
+                String unit =
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                        PANTRY_UNIT
+                                )
+                        );
+
+                String expiry =
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                        PANTRY_EXPIRY
+                                )
+                        );
+
+                Ingredient ingredient =
+                        new Ingredient(
+                                id,
+                                name,
+                                quantity,
+                                unit,
+                                expiry
+                        );
+
+                ingredientList.add(ingredient);
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return ingredientList;
+    }
     public long addIngredient(String name,
                               double quantity,
                               String unit,
@@ -105,5 +224,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + TABLE_PANTRY);
 
         onCreate(db);
+
+
+
+
     }
 }

@@ -14,12 +14,15 @@ import com.example.smartpantrymanager.models.Ingredient;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.smartpantrymanager.database.DatabaseHelper;
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerPantry;
     private PantryAdapter pantryAdapter;
     private List<Ingredient> ingredientList;
     private Button buttonAddIngredient;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,36 +35,74 @@ public class MainActivity extends AppCompatActivity {
         recyclerPantry = findViewById(R.id.recyclerPantry);
         buttonAddIngredient = findViewById(R.id.buttonAddIngredient);
 
+        databaseHelper = new DatabaseHelper(this);
         // Set up RecyclerView
         recyclerPantry.setLayoutManager(
                 new LinearLayoutManager(this)
         );
-
         ingredientList = new ArrayList<>();
+        ingredientList.addAll(databaseHelper.getAllIngredients());
 
-        // Temporary test data
-        ingredientList.add(
-                new Ingredient(
-                        1,
-                        "Milk",
-                        500,
-                        "ml",
-                        "2026-10-05"
-                )
-        );
 
-        ingredientList.add(
-                new Ingredient(
-                        2,
-                        "Eggs",
-                        6,
-                        "item",
-                        "2026-10-02"
-                )
-        );
 
         // Connect list to RecyclerView
-        pantryAdapter = new PantryAdapter(ingredientList);
+        pantryAdapter = new PantryAdapter(
+                ingredientList,
+                new PantryAdapter.OnIngredientActionListener() {
+
+                    @Override
+                    public void onEdit(Ingredient ingredient) {
+
+                        Intent intent = new Intent(
+                                MainActivity.this,
+                                AddEditIngredientActivity.class
+                        );
+
+                        intent.putExtra(
+                                "ingredient_id",
+                                ingredient.getId()
+                        );
+
+                        intent.putExtra(
+                                "ingredient_name",
+                                ingredient.getName()
+                        );
+
+                        intent.putExtra(
+                                "ingredient_quantity",
+                                ingredient.getQuantity()
+                        );
+
+                        intent.putExtra(
+                                "ingredient_unit",
+                                ingredient.getUnit()
+                        );
+
+                        intent.putExtra(
+                                "ingredient_expiry",
+                                ingredient.getExpiryDate()
+                        );
+
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onDelete(Ingredient ingredient) {
+
+                        databaseHelper.deleteIngredient(
+                                ingredient.getId()
+                        );
+
+                        ingredientList.clear();
+
+                        ingredientList.addAll(
+                                databaseHelper.getAllIngredients()
+                        );
+
+                        pantryAdapter.notifyDataSetChanged();
+                    }
+                }
+        );
         recyclerPantry.setAdapter(pantryAdapter);
 
         // Open Add Ingredient screen
@@ -74,5 +115,22 @@ public class MainActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (databaseHelper != null &&
+                ingredientList != null &&
+                pantryAdapter != null) {
+
+            ingredientList.clear();
+
+            ingredientList.addAll(
+                    databaseHelper.getAllIngredients()
+            );
+
+            pantryAdapter.notifyDataSetChanged();
+        }
     }
 }

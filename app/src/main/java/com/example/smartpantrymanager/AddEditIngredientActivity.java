@@ -21,6 +21,9 @@ public class AddEditIngredientActivity
 
     private DatabaseHelper databaseHelper;
 
+    private boolean isEditing = false;
+    private int ingredientId = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +51,55 @@ public class AddEditIngredientActivity
                 new DatabaseHelper(this);
 
         buttonSaveIngredient.setOnClickListener(
-                v -> saveIngredient()
-        );
+                v -> saveIngredient());
+
+
+        if (getIntent().hasExtra("ingredient_id")) {
+
+            isEditing = true;
+
+            ingredientId =
+                    getIntent().getIntExtra(
+                            "ingredient_id",
+                            -1
+                    );
+
+            String name =
+                    getIntent().getStringExtra(
+                            "ingredient_name"
+                    );
+
+            double quantity =
+                    getIntent().getDoubleExtra(
+                            "ingredient_quantity",
+                            0
+                    );
+
+            String unit =
+                    getIntent().getStringExtra(
+                            "ingredient_unit"
+                    );
+
+            String expiry =
+                    getIntent().getStringExtra(
+                            "ingredient_expiry"
+                    );
+
+            editIngredientName.setText(name);
+
+            editQuantity.setText(
+                    String.valueOf(quantity)
+            );
+
+            editUnit.setText(unit);
+
+            editExpiryDate.setText(expiry);
+
+            buttonSaveIngredient.setText(
+                    "Update Ingredient"
+            );
+        }
+
     }
 
     private void saveIngredient() {
@@ -139,31 +189,64 @@ public class AddEditIngredientActivity
             return;
         }
 
-        long result =
-                databaseHelper.addIngredient(
-                        name,
-                        quantity,
-                        unit,
-                        expiryDate
-                );
+        if (isEditing) {
 
-        if (result != -1) {
+            int result =
+                    databaseHelper.updateIngredient(
+                            ingredientId,
+                            name,
+                            quantity,
+                            unit,
+                            expiryDate
+                    );
 
-            Toast.makeText(
-                    this,
-                    "Ingredient added",
-                    Toast.LENGTH_SHORT
-            ).show();
+            if (result > 0) {
 
-            finish();
+                Toast.makeText(
+                        this,
+                        "Ingredient updated",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                finish();
+
+            } else {
+
+                Toast.makeText(
+                        this,
+                        "Failed to update ingredient",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
 
         } else {
 
-            Toast.makeText(
-                    this,
-                    "Failed to add ingredient",
-                    Toast.LENGTH_SHORT
-            ).show();
+            long result =
+                    databaseHelper.addIngredient(
+                            name,
+                            quantity,
+                            unit,
+                            expiryDate
+                    );
+
+            if (result != -1) {
+
+                Toast.makeText(
+                        this,
+                        "Ingredient added",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                finish();
+
+            } else {
+
+                Toast.makeText(
+                        this,
+                        "Failed to add ingredient",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        }
         }
     }
-}
