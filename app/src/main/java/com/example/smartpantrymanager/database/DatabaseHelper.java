@@ -7,9 +7,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.example.smartpantrymanager.models.Ingredient;
+import com.example.smartpantrymanager.models.Recipe;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.example.smartpantrymanager.models.RecipeIngredient;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public int updateIngredient(int id,
@@ -37,6 +39,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         String.valueOf(id)
                 }
         );
+    }
+    public List<RecipeIngredient> getRecipeIngredients(
+            int recipeId) {
+
+        List<RecipeIngredient> ingredients =
+                new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_RECIPE_INGREDIENTS,
+                null,
+                RI_RECIPE_ID + " = ?",
+                new String[]{
+                        String.valueOf(recipeId)
+                },
+                null,
+                null,
+                null
+        );
+
+        while (cursor.moveToNext()) {
+
+            int id = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(RI_ID)
+            );
+
+            String name = cursor.getString(
+                    cursor.getColumnIndexOrThrow(
+                            RI_INGREDIENT_NAME
+                    )
+            );
+
+            double quantity = cursor.getDouble(
+                    cursor.getColumnIndexOrThrow(
+                            RI_QUANTITY
+                    )
+            );
+
+            String unit = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RI_UNIT)
+            );
+
+            ingredients.add(
+                    new RecipeIngredient(
+                            id,
+                            recipeId,
+                            name,
+                            quantity,
+                            unit
+                    )
+            );
+        }
+
+        cursor.close();
+
+        return ingredients;
     }
     public int deleteIngredient(int id) {
 
@@ -125,6 +184,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return ingredientList;
+
+
     }
     public long addIngredient(String name,
                               double quantity,
@@ -559,5 +620,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         addRecipeIngredient(db, recipeId,
                 "tomato", 1, "item");
+    }
+
+    public List<Recipe> getAllRecipes() {
+
+        List<Recipe> recipes = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_RECIPES,
+                null,
+                null,
+                null,
+                null,
+                null,
+                RECIPE_NAME + " ASC"
+        );
+
+        while (cursor.moveToNext()) {
+
+            int id = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(RECIPE_ID)
+            );
+
+            String name = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RECIPE_NAME)
+            );
+
+            String instructions = cursor.getString(
+                    cursor.getColumnIndexOrThrow(
+                            RECIPE_INSTRUCTIONS
+                    )
+            );
+
+            recipes.add(
+                    new Recipe(
+                            id,
+                            name,
+                            instructions
+                    )
+            );
+        }
+
+        cursor.close();
+
+        return recipes;
     }
 }
