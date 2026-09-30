@@ -285,7 +285,7 @@ Possible future improvements include:
 
 ---
 
-## Author
+## Jaryd Luke Motssen
 
 Smart Pantry Manager
 
